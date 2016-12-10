@@ -34,18 +34,14 @@ defmodule Roomfinder do
   end
 
   def calculate_checksum(letters) do
-    letters_list = letters |> String.codepoints()
-
-    letters_list
-      |> Enum.uniq()
-      |> Enum.map(fn letter ->
-        count = Enum.count(letters_list, &(&1 === letter))
-        [letter, count]
-      end)
-      |> Enum.sort_by(fn [letter, _] -> letter end, &<=/2)
-      |> Enum.sort_by(fn [_, count] -> count end, &>=/2)
+    letters
+      |> String.codepoints()
+      |> Enum.group_by(& &1)
+      |> Enum.map(fn {char, chars} -> { char, length(chars) } end)
+      |> Enum.sort_by(fn { letter, _ } -> letter end, &<=/2)
+      |> Enum.sort_by(fn { _, count } -> count end, &>=/2)
       |> Enum.take(5)
-      |> Enum.map(&hd/1)
+      |> Enum.map(fn { letter, _ } -> letter end)
       |> Enum.join()
   end
 
