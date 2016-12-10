@@ -1,31 +1,40 @@
 defmodule Decoder do
 
-  def solve(input) do
+  def solve_most_common(input), do: solve(input, &Enum.max_by/2)
+  def solve_least_common(input), do: solve(input, &Enum.min_by/2)
+
+  defp solve(input, comparator) do
     input
     |> String.strip
     |> String.split("\n")
     |> Enum.map(&String.codepoints/1)
-    |> decode_password
+    |> decode_password(comparator)
   end
 
-  defp decode_password(codepoints) do
+  defp decode_password(codepoints, comparator) do
     codepoints
     |> Enum.flat_map(&Enum.with_index/1)
     |> Enum.group_by(fn { _, index } -> index end, fn { char, _ } -> char end)
-    |> Enum.map(fn { _, value } -> most_common_letter(value) end)
+    |> Enum.map(fn { _, value } -> most_relevant_letter(value, comparator) end)
     |> Enum.join
   end
 
-  defp most_common_letter(list) do
+  defp most_relevant_letter(list, comparator) do
     {char, _} = list
     |> Enum.group_by(& &1)
-    |> Enum.max_by(fn { _, chars } -> length(chars) end)
+    |> comparator.(fn { _, chars } -> length(chars) end)
 
     char
   end
 
 end
 
+IO.puts "Most common"
 File.read!("data")
-|> Decoder.solve
+|> Decoder.solve_most_common
+|> IO.inspect
+
+IO.puts "Least common"
+File.read!("data")
+|> Decoder.solve_least_common
 |> IO.inspect
