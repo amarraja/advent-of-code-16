@@ -15,6 +15,9 @@ defmodule Factory do
       GenServer.call(pid, { :accept_chip, value })
     end
 
+    def get_values(pid) do
+      GenServer.call(pid, { :get_values })
+    end
 
     def handle_call({ :accept_chip, value }, _, { name, low_target, high_target, [] }) do
       {:reply, :ok, { name, low_target, high_target, [value] }}
@@ -31,9 +34,13 @@ defmodule Factory do
       {:reply, :ok, { name, low_target, high_target, [] }}
     end
 
+    def handle_call({ :get_values, }, _, { _name, _low_target, _high_target, values } = state) do
+      {:reply, values, state}
+    end
+
   end
 
-  def solve(input) do
+  def setup(input) do
     Process.register(self(), :master)
     instructions = input |> String.strip |> String.split("\n", trim: true)
 
@@ -45,8 +52,18 @@ defmodule Factory do
     end
 
     send_values(instructions)
+  end
 
+  def solve_part_1 do
     wait_for_output(17, 61)
+  end
+
+  def solve_part_2 do
+    0..2
+    |> Enum.map(fn id -> String.to_atom("output #{id}") end)
+    |> Enum.map(&Bot.get_values/1)
+    |> List.flatten
+    |> Enum.reduce(1, &Kernel.*/2)
   end
 
   def wait_for_output(low, high) do
@@ -81,5 +98,7 @@ defmodule Factory do
 end
 
 File.read!("data")
-|> Factory.solve
-|> IO.inspect
+|> Factory.setup
+
+IO.inspect Factory.solve_part_1
+IO.inspect Factory.solve_part_2
