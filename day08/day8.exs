@@ -31,14 +31,13 @@ defmodule Screen do
   end
 
   defp create_screen(width, height) do
-    width_range = 0..width - 1
-    height_range = 0..height - 1
-    screen = for x <- width_range, y <- height_range, into: %{} do
+    screen = %{
+      width_range: 0..width - 1,
+      height_range: 0..height - 1
+    }
+    screen = for x <- screen.width_range, y <- screen.height_range, into: screen do
       { { x, y }, false }
     end
-    screen = Map.put(screen, :width_range, width_range)
-    screen = Map.put(screen, :height_range, height_range)
-    screen
   end
 
   defp print_screen(screen) do
@@ -64,20 +63,22 @@ defmodule Screen do
   end
 
   defp execute_command({ :rotate_row, row, by }, screen) do
-    new_row = get_row(row, screen) |> rotate_right(by)
-    new_row
-    |> Enum.with_index
-    |> Enum.reduce(screen, fn {value, idx}, screen ->
-      set_pixel({idx, row}, value, screen)
-    end)
+    get_row(row, screen)
+    |> rotate_right(by)
+    |> apply_pixels(screen, & { &1, row })
   end
 
   defp execute_command({ :rotate_col, col, by }, screen) do
-    new_row = get_col(col, screen) |> rotate_right(by)
-    new_row
+    get_col(col, screen)
+    |> rotate_right(by)
+    |> apply_pixels(screen, & { col, &1 })
+  end
+
+  defp apply_pixels(pixels, screen, coords_builder) do
+    pixels
     |> Enum.with_index
     |> Enum.reduce(screen, fn {value, idx}, screen ->
-      set_pixel({col, idx}, value, screen)
+      set_pixel(coords_builder.(idx), value, screen)
     end)
   end
 
@@ -90,7 +91,7 @@ defmodule Screen do
   end
 
   defp get_row(row, screen) do
-    for x <- screen_width_range, into: [], do: screen[{x, row}]
+    for x <- screen.width_range, into: [], do: screen[{x, row}]
   end
 
   defp get_col(col, screen) do
