@@ -1,3 +1,5 @@
+#Influenced from https://github.com/sotojuan/advent/blob/master/2016/2016-12-10/solution.exs
+
 defmodule Factory do
 
   defmodule Bot do
