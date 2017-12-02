@@ -85,3 +85,10 @@ IO.inspect Factory.run_state(Factory.initial([
   [{ :chip, :thulium}],
   [ ]
 ]))
+
+# IO.inspect Factory.run_state(Factory.initial([
+#   [{ :chip, :strontium }, { :gen, :strontium }, { :chip, :plutonium }, { :gen, :plutonium }, { :chip, :elerium }, { :gen, :elerium }, { :chip, :dilithium }, { :gen, :dilithium } ],
+#   [{ :gen, :thulium}, { :chip, :ruthenium }, { :gen, :ruthenium }, { :chip, :curium }, { :gen, :curium } ],
+#   [{ :chip, :thulium}],
+#   [ ]
+# ]))
